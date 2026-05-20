@@ -1,7 +1,7 @@
-const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
-const { SignedXml } = require('xml-crypto');
-const { DOMParser, XMLSerializer } = require('@xmldom/xmldom');
+const crypto = require("crypto");
+const { v4: uuidv4 } = require("uuid");
+const { SignedXml } = require("xml-crypto");
+const { DOMParser, XMLSerializer } = require("@xmldom/xmldom");
 
 // Hardcoded Certificates
 const CERT = `-----BEGIN CERTIFICATE-----
@@ -54,26 +54,29 @@ xTfmps47fERyMgFrpdhtrZo=
 
 // Configuration
 const OKTA_DOMAIN = "bala-secures-ai.oktapreview.com";
-const MCP_GW_CLIENT_ID = "0oax1qvtg5B59aiRa1d7";
-const MCP_GW_CLIENT_SECRET = "sGGZlwdPZvdvD6X8N5ag2XjRGpV66LQ0G_ZBEQalTI4n6RHfBqfdi85pyPSrBQlC";
-const MCP_GW_IDP_ISSUER_URI = "https://mcp-gateway.saml-assertion";
-const MCP_GW_IDP_ACS_URL = "https://ai.authstar.org/sso/saml2/0oaw3jkwkkaU4KMOa1d7";
-const MCP_GW_IDP_AUDIENCE_URI = "https://www.okta.com/saml2/service-provider/spbvdqwtzjxebkcedihu";
+const MCP_GW_CLIENT_ID = "0oayvagmqu9IzSUYC1d7";
+const MCP_GW_CLIENT_SECRET =
+  "nPUn7VhW-6ntXoXbLDn2e5C8AnI9uxNOfDDOYkiqjj76rRuVrzGt1wPTTfdGVCjO";
+const MCP_GW_IDP_ISSUER_URI = "https://benefits.streamward.com";
+const MCP_GW_IDP_ACS_URL =
+  "https://ai.authstar.org/sso/saml2/0oaw3jkwkkaU4KMOa1d7";
+const MCP_GW_IDP_AUDIENCE_URI =
+  "https://www.okta.com/saml2/service-provider/spbvdqwtzjxebkcedihu";
 
 function generateSamlId() {
-  return `id${uuidv4().replace(/-/g, '')}`;
+  return `id${uuidv4().replace(/-/g, "")}`;
 }
 
 function getIsoTimestamp(deltaSeconds = 0) {
   const dt = new Date(Date.now() + deltaSeconds * 1000);
-  return dt.toISOString().replace(/\.\d{3}Z$/, 'Z');
+  return dt.toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
 function getCertificateContent(cert) {
   return cert
-    .replace(/-----BEGIN CERTIFICATE-----/, '')
-    .replace(/-----END CERTIFICATE-----/, '')
-    .replace(/\s/g, '');
+    .replace(/-----BEGIN CERTIFICATE-----/, "")
+    .replace(/-----END CERTIFICATE-----/, "")
+    .replace(/\s/g, "");
 }
 
 function generateSignedSamlAssertion(email) {
@@ -88,60 +91,63 @@ function generateSignedSamlAssertion(email) {
   const assertionXml = `<saml2:Assertion ID="${assertionId}" IssueInstant="${now}" Version="2.0" xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"><saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">${MCP_GW_IDP_ISSUER_URI}</saml2:Issuer><saml2:Subject><saml2:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">${email}</saml2:NameID><saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml2:SubjectConfirmationData NotOnOrAfter="${notOnOrAfter}" Recipient="${MCP_GW_IDP_ACS_URL}"/></saml2:SubjectConfirmation></saml2:Subject><saml2:Conditions NotBefore="${notBefore}" NotOnOrAfter="${notOnOrAfter}"><saml2:AudienceRestriction><saml2:Audience>${MCP_GW_IDP_AUDIENCE_URI}</saml2:Audience></saml2:AudienceRestriction></saml2:Conditions><saml2:AuthnStatement AuthnInstant="${now}" SessionIndex="${sessionId}"><saml2:AuthnContext><saml2:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml2:AuthnContextClassRef></saml2:AuthnContext></saml2:AuthnStatement></saml2:Assertion>`;
 
   // Parse the assertion
-  const doc = new DOMParser().parseFromString(assertionXml, 'text/xml');
+  const doc = new DOMParser().parseFromString(assertionXml, "text/xml");
 
   // Create the signature
   const sig = new SignedXml();
-  sig.signatureAlgorithm = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
-  sig.canonicalizationAlgorithm = 'http://www.w3.org/2001/10/xml-exc-c14n#';
+  sig.signatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+  sig.canonicalizationAlgorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
   sig.addReference(
     `//*[@ID='${assertionId}']`,
     [
-      'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
-      'http://www.w3.org/2001/10/xml-exc-c14n#'
+      "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+      "http://www.w3.org/2001/10/xml-exc-c14n#",
     ],
-    'http://www.w3.org/2001/04/xmlenc#sha256'
+    "http://www.w3.org/2001/04/xmlenc#sha256",
   );
 
   sig.signingKey = KEY;
 
   sig.keyInfoProvider = {
-    getKeyInfo: function() {
+    getKeyInfo: function () {
       return `<X509Data><X509Certificate>${getCertificateContent(CERT)}</X509Certificate></X509Data>`;
-    }
+    },
   };
 
   sig.computeSignature(assertionXml, {
-    prefix: 'ds',
-    location: { reference: `//*[@ID='${assertionId}']`, action: 'prepend' }
+    prefix: "ds",
+    location: { reference: `//*[@ID='${assertionId}']`, action: "prepend" },
   });
 
   const signedAssertion = sig.getSignedXml();
 
   // Base64 encode
-  return Buffer.from(signedAssertion, 'utf-8').toString('base64');
+  return Buffer.from(signedAssertion, "utf-8").toString("base64");
 }
 
 async function exchangeSamlForToken(samlAssertion) {
   const url = `https://${OKTA_DOMAIN}/oauth2/v1/token`;
 
   const params = new URLSearchParams({
-    'grant_type': 'urn:ietf:params:oauth:grant-type:saml2-bearer',
-    'scope': 'openid email profile phone okta.myAccount.phone.manage offline_access',
-    'assertion': samlAssertion
+    grant_type: "urn:ietf:params:oauth:grant-type:saml2-bearer",
+    scope:
+      "openid email profile phone okta.myAccount.phone.manage offline_access",
+    assertion: samlAssertion,
   });
 
-  const auth = Buffer.from(`${MCP_GW_CLIENT_ID}:${MCP_GW_CLIENT_SECRET}`).toString('base64');
+  const auth = Buffer.from(
+    `${MCP_GW_CLIENT_ID}:${MCP_GW_CLIENT_SECRET}`,
+  ).toString("base64");
 
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${auth}`
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${auth}`,
     },
-    body: params.toString()
+    body: params.toString(),
   });
 
   const data = await response.json();
@@ -155,36 +161,36 @@ async function exchangeSamlForToken(samlAssertion) {
 
 exports.handler = async (event, context) => {
   // Handle CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
       },
-      body: ''
+      body: "",
     };
   }
 
   // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Method not allowed. Use POST.' })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method not allowed. Use POST." }),
     };
   }
 
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || "{}");
     const email = body.email;
 
     if (!email) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Email is required' })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Email is required" }),
       };
     }
 
@@ -197,20 +203,19 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify({
         saml_assertion: signedAssertion,
-        token_response: tokenResponse
-      })
+        token_response: tokenResponse,
+      }),
     };
-
   } catch (error) {
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: error.message })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };
