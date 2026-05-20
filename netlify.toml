@@ -1,0 +1,11 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  python_version = "3.11"
+
+[[redirects]]
+  from = "/generate-saml-assertion"
+  to = "/.netlify/functions/generate-saml-assertion"
+  status = 200
