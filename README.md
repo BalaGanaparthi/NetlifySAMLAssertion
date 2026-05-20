@@ -6,14 +6,12 @@ Serverless function that generates signed SAML assertions and exchanges them for
 
 ```
 NetlifySAMLAssertion/
-├── netlify.toml                           # Netlify configuration
+├── netlify.toml                              # Netlify configuration
+├── package.json                              # Node.js dependencies
 ├── public/
-│   └── index.html                         # Web UI
-├── netlify/
-│   └── functions/
-│       ├── generate-saml-assertion.py     # Serverless function
-│       └── requirements.txt               # Python dependencies
-├── runbook.md                             # Okta setup guide
+│   └── index.html                            # Web UI
+├── netlify/functions/
+│   └── generate-saml-assertion.js            # Serverless function
 └── README.md
 ```
 
@@ -59,5 +57,6 @@ curl -X POST https://your-site.netlify.app/generate-saml-assertion \
 ## Local Development
 
 ```bash
+npm install
 netlify dev
 ```

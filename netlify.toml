@@ -2,8 +2,8 @@
   publish = "public"
   functions = "netlify/functions"
 
-[functions."generate-saml-assertion"]
-  runtime = "python3.11"
+[functions]
+  node_bundler = "esbuild"
 
 [[redirects]]
   from = "/generate-saml-assertion"

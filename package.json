@@ -1,0 +1,10 @@
+{
+  "name": "netlify-saml-assertion",
+  "version": "1.0.0",
+  "description": "SAML Assertion Generator for Okta",
+  "dependencies": {
+    "uuid": "^9.0.0",
+    "xml-crypto": "^3.2.0",
+    "@xmldom/xmldom": "^0.8.10"
+  }
+}
