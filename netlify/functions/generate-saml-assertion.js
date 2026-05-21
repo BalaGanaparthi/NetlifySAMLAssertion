@@ -54,9 +54,9 @@ xTfmps47fERyMgFrpdhtrZo=
 
 // Configuration
 const OKTA_DOMAIN = "bala-secures-ai.oktapreview.com";
-const MCP_GW_CLIENT_ID = "0oax1qvtg5B59aiRa1d7";
+const MCP_GW_CLIENT_ID = "0oayvagmqu9IzSUYC1d7";
 const MCP_GW_CLIENT_SECRET =
-  "sGGZlwdPZvdvD6X8N5ag2XjRGpV66LQ0G_ZBEQalTI4n6RHfBqfdi85pyPSrBQlC";
+  "nPUn7VhW-6ntXoXbLDn2e5C8AnI9uxNOfDDOYkiqjj76rRuVrzGt1wPTTfdGVCjO";
 const MCP_GW_IDP_ISSUER_URI = "https://mcp-gateway.saml-assertion";
 const MCP_GW_IDP_ACS_URL =
   "https://ai.authstar.org/sso/saml2/0oaw3jkwkkaU4KMOa1d7";
